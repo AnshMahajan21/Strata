@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink-900 text-chalk font-sans antialiased;
+  background-image:
+    radial-gradient(120% 90% at 80% -20%, rgba(255, 255, 255, 0.05), transparent 55%),
+    radial-gradient(90% 60% at 0% 0%, rgba(255, 255, 255, 0.03), transparent 50%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Thin, restrained scrollbar */
+*::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-[11px] uppercase tracking-eyebrow text-fog font-medium;
+  }
+  .glass {
+    @apply rounded-xl2 border border-line bg-ink-800/70 backdrop-blur-sm shadow-glass;
+  }
+  .hairline {
+    @apply border-line;
+  }
+  .focus-ring {
+    @apply outline-none focus-visible:ring-1 focus-visible:ring-line-strong focus-visible:ring-offset-0;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

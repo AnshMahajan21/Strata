@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+!.env.example
+.DS_Store
+.vercel
+supabase/.temp
+
+# tsc build info
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
