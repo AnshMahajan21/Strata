@@ -65,48 +65,22 @@ supabase/
   functions/   financials/ (Alpha Vantage proxy with a Postgres cache)
 ```
 
-## Local development
-
-Requirements: Node.js 18 or 20 and above.
-
-```bash
-npm install
-npm run dev
-```
-
-The dev server starts on http://localhost:5173 and runs on mock data out of the
-box. Search for RELIANCE, TCS, or INFY to explore the UI.
-
-Scripts:
-
-- `npm run dev` starts the Vite dev server
-- `npm run build` type checks with `tsc -b` and produces a production build in `dist`
-- `npm run preview` serves the production build locally
-- `npm run lint` runs ESLint
-
-## Environment variables
-
-Frontend variables are read by Vite and must be prefixed with `VITE_`. Copy
-`.env.example` to `.env` and fill in the values when connecting a backend.
-
-- `VITE_SUPABASE_URL` Supabase project URL. Leave blank to force mock data.
-- `VITE_SUPABASE_ANON_KEY` Supabase anon public key.
-- `VITE_USE_MOCK` set to `true` to force mock data even when Supabase is set.
-
-The data provider key is a server side secret, set on the edge function and
-never exposed to the browser:
-
-- `ALPHAVANTAGE_API_KEY` Alpha Vantage key.
-- `EXCHANGE_SUFFIX` exchange suffix for symbols, default `.BSE`.
-
-## Backend setup in brief
-
-1. Create a Supabase project and run `supabase/migrations/0001_init.sql` in the
-   SQL editor to create tables and policies.
-2. Deploy the `financials` edge function and set `ALPHAVANTAGE_API_KEY` as a
-   secret. This can be done through the Supabase dashboard editor.
-3. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to the frontend
-   environment, locally in `.env` or in the Vercel project settings.
+## APIs
+ 
+Alpha Vantage (data source, called only from the edge function using .BSE symbols):
+ 
+- `SYMBOL_SEARCH` ticker search
+- `OVERVIEW` company profile, market cap, key ratios
+- `GLOBAL_QUOTE` current price and daily change
+- `TIME_SERIES_DAILY` historical price for the chart
+- `INCOME_STATEMENT` revenue, profit, margins
+- `BALANCE_SHEET` assets, liabilities, equity
+- `CASH_FLOW` operating cash flow, capex, free cash flow
+Supabase:
+ 
+- `Auth` optional email/password sign in
+- `Postgres` stores profiles, watchlists, search history, cached financials (with Row Level Security)
+- `Edge Function (financials)` proxies Alpha Vantage, normalises responses, caches them
 
 ## Notes and limits
 
@@ -117,3 +91,9 @@ are detected and never cached. Coverage for some .BSE tickers can be sparse, in
 which case empty ratio cells render as a dash.
 
 All mock figures are illustrative and the app is not investment advice.
+
+## Disclaimer
+ 
+Mock figures are illustrative only. Strata is a tool for reading financials and
+is not investment advice.
+
