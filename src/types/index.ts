@@ -24,14 +24,11 @@ export interface PricePoint {
 export interface StatementRow {
   label: string;
   key: string;
-  /** Most recent first. Values in raw currency units. */
   values: number[];
-  /** A ratio/percent row formats differently. */
   format?: "currency" | "percent" | "ratio";
 }
 
 export interface Statement {
-  /** Period labels, most recent first, e.g. ["2024","2023","2022"]. */
   periods: string[];
   rows: StatementRow[];
 }
@@ -59,4 +56,25 @@ export interface WatchlistEntry {
   symbol: string;
   name: string;
   addedAt: string;
+}
+
+/** AI (or fallback) financial-health analysis for a single company. */
+export interface AIAnalysis {
+  symbol: string;
+  verdict: string;            // one-line takeaway
+  score: number;              // 0-100 composite health score
+  summary: string;            // paragraph assessment
+  strengths: string[];
+  risks: string[];
+  generatedBy: "ai" | "computed";
+}
+
+/** Result of comparing up to 3 companies. */
+export interface ComparisonResult {
+  symbols: string[];
+  scores: Record<string, number>;     // composite score per symbol
+  winner: string;                     // best symbol overall
+  reasoning: string;                  // why the winner won
+  perCompany: Record<string, string>; // short AI summary per company
+  generatedBy: "ai" | "computed";
 }
