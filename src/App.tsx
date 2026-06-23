@@ -4,6 +4,7 @@ import { AuthProvider } from "@/context/AuthProvider";
 import { Landing } from "@/pages/Landing";
 import { Dashboard } from "@/pages/Dashboard";
 import { Company } from "@/pages/Company";
+import { Compare } from "@/pages/Compare";
 import { Watchlist } from "@/pages/Watchlist";
 import { Login } from "@/pages/Login";
 import { NotFound } from "@/pages/NotFound";
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/company/:symbol" element={<Company />} />
+            <Route path="/compare" element={<Compare />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
