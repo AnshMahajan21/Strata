@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { GitCompare } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -9,6 +10,7 @@ import { FinancialsBarChart } from "@/components/charts/FinancialsBarChart";
 import { StatementTable } from "@/components/company/StatementTable";
 import { RatioGrid } from "@/components/company/RatioGrid";
 import { WatchlistButton } from "@/components/company/WatchlistButton";
+import { AIAnalysisCard } from "@/components/company/AIAnalysisCard";
 import { useFinancials, usePrices, useProfile, useRatios } from "@/hooks/useCompany";
 import { compactCurrency, money, signedPercent } from "@/lib/format";
 import type { CompanyFinancials } from "@/types";
@@ -63,7 +65,17 @@ export function Company() {
             </div>
           )}
         </div>
-        {p && <WatchlistButton symbol={sym} name={p.name} />}
+        {p && (
+          <div className="flex items-center gap-2">
+            <Link
+              to={`/compare?symbols=${sym}`}
+              className="focus-ring inline-flex items-center gap-2 rounded-full border border-line px-4 py-2.5 text-sm text-haze transition-colors hover:text-chalk hover:bg-ink-700/40"
+            >
+              <GitCompare size={15} /> Compare
+            </Link>
+            <WatchlistButton symbol={sym} name={p.name} />
+          </div>
+        )}
       </div>
 
       {/* price + about */}
@@ -110,6 +122,11 @@ export function Company() {
           )}
         </Card>
       </div>
+
+      {/* AI financial analyst */}
+      <section className="mb-8">
+        <AIAnalysisCard symbol={sym} />
+      </section>
 
       {/* key ratios */}
       <section className="mb-8">
