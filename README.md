@@ -1,99 +1,80 @@
 # Strata
 
-Strata is a single-page web app for browsing Indian company fundamentals.
-It presents income statements, balance sheets, cash flow, key ratios, and price
-history for NSE/BSE listed companies, with values in INR using the lakh and crore
-system. The interface follows an editorial dark theme.
-
-The app is built so it runs end to end on bundled mock data with no backend.
-Adding Supabase credentials and an Alpha Vantage key switches it to live data
-without any code changes.
+Single-page app for analysing US (NYSE/NASDAQ) company fundamentals in USD:
+income statement, balance sheet, cash flow, key ratios, and price history, plus
+an AI financial analyst and a side-by-side comparator that picks the strongest
+of up to three companies.
 
 ## Tech stack
 
-Frontend:
+- React 18 + TypeScript
+- Vite 5 (dev server and bundler)
+- Tailwind CSS 3
+- React Router 6
+- TanStack Query 5 (fetching and caching)
+- Recharts 2 (charts), lucide-react (icons)
+- Supabase (Auth, Postgres, Edge Functions on Deno)
+- Google Gemini for AI analysis
+- Vercel (hosting)
 
-- React 18 with TypeScript
-- Vite 5 for dev server and bundling
-- Tailwind CSS 3 for styling
-- React Router 6 for routing
-- TanStack Query 5 for data fetching and caching
-- Recharts 2 for charts, lucide-react for icons
+## APIs
 
-Backend and hosting:
+Financial Modeling Prep (data source, US tickers, called only from the edge function):
 
-- Supabase for Auth and Postgres, with Row Level Security
-- A Supabase Edge Function (Deno) that proxies the data provider
-- Alpha Vantage as the financial data source (.BSE symbols)
-- Vercel for frontend hosting
+- `search` ticker search
+- `profile` company profile, price, market cap
+- `historical-price-full` price history for the chart
+- `income-statement`, `balance-sheet-statement`, `cash-flow-statement` financial statements
+- `key-metrics-ttm` P/E, P/S, net margin, ROE
 
-## Architecture
+Google Gemini (`gemini-1.5-flash`):
 
-The browser never talks to the data provider directly. Requests flow through a
-Supabase Edge Function that holds the Alpha Vantage key server side, normalises
-responses into the shapes the UI expects, and caches results in Postgres to
-respect the provider's free tier limits.
+- `analyze` generates a per-company financial-health narrative (verdict, summary, strengths, risks)
+- `compare` generates the reasoning and per-company notes for the winner
 
-```
-React (Vite)  ->  Supabase Edge Function  ->  Alpha Vantage
-   |                (holds API key,              (Indian fundamentals)
-   |                 caches in Postgres)
-   +->  Supabase Auth and Postgres (watchlists, RLS)
-```
+Supabase:
 
-Data access is centralised in `src/lib/api.ts`. When Supabase credentials are
-absent, or when `VITE_USE_MOCK` is set to `true`, that layer returns bundled
-mock data from `src/lib/mockData.ts` instead of calling the edge function. This
-keeps the app fully runnable during local development.
+- `Auth` optional email sign-in
+- `Postgres` profiles, watchlists, search history, cached financials and AI results (Row-Level Security)
+- `Edge Function (financials)` proxies FMP and Gemini, normalises responses, caches them 24h
 
-Authentication is optional. Anonymous visitors can browse everything and keep a
-watchlist in localStorage. Signing in with Supabase Auth syncs the watchlist to
-Postgres and merges any local entries into the account.
+## Features
 
-## Project structure
+- Company page with price chart, full financial statements, and key ratios
+- AI Financial Analyst: a 0-100 health score computed from the fundamentals, with an AI-written assessment, strengths, and risks
+- Comparator: stack up to 3 companies on their metrics, with AI summaries and an AI verdict naming the strongest stock
+- Watchlist: saved locally for guests and synced to the account on sign-in
+
+## How the AI works
+
+Numeric scores are computed deterministically from real figures (revenue growth,
+net margin, free cash flow, leverage), so they are grounded rather than guessed.
+Gemini is asked only for the written narrative and the comparison reasoning. If
+no Gemini key is set, the app falls back to a fully computed analysis, so the
+feature never appears empty.
+
+## Structure
 
 ```
 src/
-  lib/         Supabase client, API layer with mock fallback, formatting, mock data
-  types/       Shared TypeScript interfaces
-  hooks/       useCompany (queries), useWatchlist (local and cloud sync)
+  lib/         supabase client, api (mock fallback), format, mockData (incl. mock AI)
+  types/       shared TypeScript interfaces
+  hooks/       useCompany (queries incl. useAnalysis, useComparison), useWatchlist
   context/     AuthProvider
-  components/  ui, charts, company, and layout components
-  pages/       Landing, Dashboard, Company, Watchlist, Login, NotFound
+  components/  ui, charts, company (incl. AIAnalysisCard), layout
+  pages/       Landing, Dashboard, Company, Compare, Watchlist, Login, NotFound
 supabase/
-  migrations/  0001_init.sql (schema, RLS policies, signup trigger)
-  functions/   financials/ (Alpha Vantage proxy with a Postgres cache)
+  migrations/  0001_init.sql       schema, RLS policies, signup trigger
+  functions/   financials/index.ts FMP + Gemini proxy with a Postgres cache
 ```
 
-## APIs
- 
-Alpha Vantage (data source, called only from the edge function using .BSE symbols):
- 
-- `SYMBOL_SEARCH` ticker search
-- `OVERVIEW` company profile, market cap, key ratios
-- `GLOBAL_QUOTE` current price and daily change
-- `TIME_SERIES_DAILY` historical price for the chart
-- `INCOME_STATEMENT` revenue, profit, margins
-- `BALANCE_SHEET` assets, liabilities, equity
-- `CASH_FLOW` operating cash flow, capex, free cash flow
-Supabase:
- 
-- `Auth` optional email/password sign in
-- `Postgres` stores profiles, watchlists, search history, cached financials (with Row Level Security)
-- `Edge Function (financials)` proxies Alpha Vantage, normalises responses, caches them
+## Notes
 
-## Notes and limits
-
-Alpha Vantage's free tier allows roughly 25 requests per day and 5 per minute.
-A full company view costs about seven calls, so the edge function caches
-responses for 24 hours in the `cached_financials` table. Rate limit responses
-are detected and never cached. Coverage for some .BSE tickers can be sparse, in
-which case empty ratio cells render as a dash.
-
-All mock figures are illustrative and the app is not investment advice.
+- Runs on bundled US mock data (with a computed AI analysis) when no backend is configured.
+- API keys stay server-side in the edge function and never reach the browser.
+- FMP free tier allows ~250 requests/day; responses cache 24h, which matters for the comparator (it pulls up to 3 companies).
+- Gemini has a free tier; the app degrades gracefully to computed analysis without it.
 
 ## Disclaimer
- 
-Mock figures are illustrative only. Strata is a tool for reading financials and
-is not investment advice.
 
+Mock figures are illustrative. Strata is for reading and analysing financials and is not investment advice.
