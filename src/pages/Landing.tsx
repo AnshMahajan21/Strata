@@ -6,9 +6,9 @@ import { Footer } from "@/components/layout/Footer";
 import { mockPrices } from "@/lib/mockData";
 
 const featured = [
-  { symbol: "RELIANCE", name: "Reliance", change: 0.83 },
-  { symbol: "INFY", name: "Infosys", change: 1.17 },
-  { symbol: "TCS", name: "TCS", change: -0.45 },
+  { symbol: "AAPL", name: "Apple", change: 1.06 },
+  { symbol: "NVDA", name: "NVIDIA", change: 3.1 },
+  { symbol: "MSFT", name: "Microsoft", change: -0.7 },
 ];
 
 export function Landing() {
