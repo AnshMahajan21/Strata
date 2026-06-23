@@ -36,7 +36,7 @@ export function PriceChart({ data, up }: { data: PricePoint[]; up: boolean }) {
             width={48}
             axisLine={false}
             tickLine={false}
-            tickFormatter={(v: number) => `₹${v.toFixed(0)}`}
+            tickFormatter={(v: number) => `$${v.toFixed(0)}`}
           />
           <Tooltip
             contentStyle={{
