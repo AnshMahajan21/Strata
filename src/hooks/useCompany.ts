@@ -44,3 +44,21 @@ export function useSearch(query: string) {
     staleTime: 60 * 1000,
   });
 }
+
+export function useAnalysis(symbol: string) {
+  return useQuery({
+    queryKey: ["analysis", symbol],
+    queryFn: () => api.analyze(symbol),
+    enabled: !!symbol,
+    staleTime: 60 * 60 * 1000,
+  });
+}
+
+export function useComparison(symbols: string[]) {
+  return useQuery({
+    queryKey: ["compare", [...symbols].sort().join(",")],
+    queryFn: () => api.compare(symbols),
+    enabled: symbols.length >= 2,
+    staleTime: 30 * 60 * 1000,
+  });
+}
