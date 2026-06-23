@@ -10,9 +10,9 @@ import { mockPrices, MOCK_SYMBOLS, mockProfile } from "@/lib/mockData";
 import { compactCurrency, signedPercent } from "@/lib/format";
 
 const indices = [
-  { label: "NIFTY 50", value: "24,852.15", change: 0.38 },
-  { label: "SENSEX", value: "81,564.10", change: 0.42 },
-  { label: "NIFTY BANK", value: "52,318.85", change: -0.18 },
+  { label: "S&P 500", value: "5,431.60", change: 0.42 },
+  { label: "Nasdaq", value: "17,862.23", change: 0.81 },
+  { label: "Dow Jones", value: "39,118.86", change: -0.21 },
 ];
 
 export function Dashboard() {
